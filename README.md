@@ -15,6 +15,8 @@ https://www.dicomstandard.org/docs/librariesprovider2/dicomdocuments/wp-cotent/u
 
 https://dicom.nema.org/dicom/2013/output/chtml/part04/sect_i.4.html
 
+https://dicom.innolitics.com/ciods/enhanced-sr/sr-document-content/0040a730
+
 https://github.com/OHIF/Viewers/issues/64
 
 "Basic Text SR IOD" 1.2.840.10008.5.1.4.1.1.88.11
