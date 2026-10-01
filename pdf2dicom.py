@@ -43,4 +43,15 @@ def generate_dicom_from_pdf(pdf_file):
     ds.SpecificCharacterSet = 'ISO_IR 100' 
     # more codes for charecter encoding here https://dicom.innolitics.com/ciods/cr-image/sop-common/00080005 
 
+    ds.SOPInstanceUID = generate_uid()
+    ds.SeriesNumber = series_number
+    ds.SeriesInstanceUID = series_instance_uid
+    ds.SeriesDescription = series_description
+    ds.PatientID = ref_dcm_obj.PatientID
+    ds.PatientName = ref_dcm_obj.PatientName
+    ds.StudyDate = ref_dcm_obj.StudyDate
+    ds.StudyInstanceUID = ref_dcm_obj.StudyInstanceUID
+    ds.ReferencedSeriesSequence = [ref_dcm_obj]
+
+
     return ds

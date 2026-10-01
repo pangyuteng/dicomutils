@@ -32,10 +32,6 @@ def generate_dicom_from_json(input_json):
 
     ds.SOPClassUID = BasicTextSRIOD
 
-    ds.StudyInstanceUID = generate_uid()
-    ds.SeriesInstanceUID = generate_uid()
-    ds.SOPInstanceUID = generate_uid()
-
     ds.Modality = 'SR'
     ds.SpecificCharacterSet = 'ISO_IR 100' 
     
@@ -51,6 +47,16 @@ def generate_dicom_from_json(input_json):
     block.TextValue = input_json_str
 
     ds.ContentSequence = Sequence([block])
+
+    ds.SeriesNumber = series_number
+    ds.SOPInstanceUID = generate_uid()
+    ds.SeriesInstanceUID = generate_uid()
+    ds.SeriesDescription = series_description
+    ds.PatientID = ref_dcm_obj.PatientID
+    ds.PatientName = ref_dcm_obj.PatientName
+    ds.StudyDate = ref_dcm_obj.StudyDate
+    ds.StudyInstanceUID = ref_dcm_obj.StudyInstanceUID
+    ds.ReferencedSeriesSequence = [ref_dcm_obj]
 
     return ds
 
