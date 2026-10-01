@@ -1,15 +1,23 @@
 import pydicom
 import tempfile
 import datetime
+import json
+from pydicom.sequence import Sequence
 from pydicom.dataset import Dataset, FileDataset
+from pydicom.uid import generate_uid
 
-def generate_dicom_from_pdf(pdf_file):
+def generate_dicom_from_json(input_json):
+
+    input_json_str = json.dumps(input_json)
+
     suffix = '.dcm'
     filename = tempfile.NamedTemporaryFile(suffix=suffix).name
 
+    BasicTextSRIOD = '1.2.840.10008.5.1.4.1.1.88.11'
+
     file_meta = Dataset()
-    file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11' # Basic Text SR IOD
-    #file_meta.MediaStorageSOPInstanceUID = 
+    file_meta.MediaStorageSOPClassUID = BasicTextSRIOD
+    file_meta.MediaStorageSOPInstanceUID = generate_uid()
     file_meta.ImplementationClassUID = '1.3.46.670589.50.1.8.0'
     file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
 
@@ -20,18 +28,44 @@ def generate_dicom_from_pdf(pdf_file):
 
     dt = datetime.datetime.now()
     ds.ContentDate = dt.strftime('%Y%m%d')
-    timeStr = dt.strftime('%H%M%S.%f')
-    ds.ContentTime = timeStr
+    ds.ContentTime = dt.strftime('%H%M%S.%f')
 
-    ds.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11'
+    ds.SOPClassUID = BasicTextSRIOD
+
+    ds.StudyInstanceUID = generate_uid()
+    ds.SeriesInstanceUID = generate_uid()
+    ds.SOPInstanceUID = generate_uid()
 
     ds.Modality = 'SR'
-    ds.ConversionType = 'WSD' #workstation
     ds.SpecificCharacterSet = 'ISO_IR 100' 
+    
+    sub_block = Dataset()
+    sub_block.CodeValue = 'CODE_01'
+    sub_block.CodingSchemeDesignator = 'NA'
+    sub_block.CodeMeaning = 'CAD Summary'
 
+    block = Dataset()
+    block.RelationshipType = "CONTAINS"
+    block.ValueType = "TEXT"
+    block.ConceptNameCodeSequence = Sequence([sub_block])
+    block.TextValue = input_json_str
 
+    ds.ContentSequence = Sequence([block])
 
     return ds
+
+if __name__ == "__main__":
+
+    ds = generate_dicom_from_json({'test':'ok'})
+    ds.save_as("ok.dcm")
+
+"""
+
+docker run -it -w /opt/workdir -v $PWD:/opt/workdir pangyuteng/dcm:latest bash
+
+
+"""
+
 """
 (0040, a040) Value Type                          CS: 'CONTAINER'
 (0040, a043)  Concept Name Code Sequence  1 item(s) ----
