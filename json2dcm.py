@@ -48,6 +48,7 @@ def generate_dicom_from_json(input_json):
 
     ds.ContentSequence = Sequence([block])
 
+    # TODO:
     ds.SeriesNumber = series_number
     ds.SOPInstanceUID = generate_uid()
     ds.SeriesInstanceUID = generate_uid()
