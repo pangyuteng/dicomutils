@@ -21,6 +21,8 @@ def generate_dicom_from_json(input_json):
     file_meta.ImplementationClassUID = '1.3.46.670589.50.1.8.0'
     file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
 
+    pydicom.dataset.validate_file_meta(file_meta,enforce_standard=False)
+
     ds = FileDataset(filename, {}, file_meta=file_meta, preamble=b"\0" * 128)
 
     ds.is_little_endian = True
@@ -48,16 +50,16 @@ def generate_dicom_from_json(input_json):
 
     ds.ContentSequence = Sequence([block])
 
-    # TODO:
-    ds.SeriesNumber = series_number
-    ds.SOPInstanceUID = generate_uid()
-    ds.SeriesInstanceUID = generate_uid()
-    ds.SeriesDescription = series_description
-    ds.PatientID = ref_dcm_obj.PatientID
-    ds.PatientName = ref_dcm_obj.PatientName
-    ds.StudyDate = ref_dcm_obj.StudyDate
-    ds.StudyInstanceUID = ref_dcm_obj.StudyInstanceUID
-    ds.ReferencedSeriesSequence = [ref_dcm_obj]
+    # # TODO:
+    # ds.SeriesNumber = series_number
+    # ds.SOPInstanceUID = generate_uid()
+    # ds.SeriesInstanceUID = generate_uid()
+    # ds.SeriesDescription = series_description
+    # ds.PatientID = ref_dcm_obj.PatientID
+    # ds.PatientName = ref_dcm_obj.PatientName
+    # ds.StudyDate = ref_dcm_obj.StudyDate
+    # ds.StudyInstanceUID = ref_dcm_obj.StudyInstanceUID
+    # ds.ReferencedSeriesSequence = [ref_dcm_obj]
 
     return ds
 
