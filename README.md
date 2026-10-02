@@ -7,6 +7,7 @@ providing below options for saving json/csv (text) to dicom:
 
  + save as text or binary to private tag, see https://grok.com/share/bGVnYWN5_3247a87d-5aae-4e44-8bc8-5cf544f9b16c
 
+ + can you embed the csv or json file just like pdf?
 
 ```
 
