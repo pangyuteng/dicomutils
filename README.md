@@ -1,7 +1,14 @@
 
-should you embed json to dicom?
+```
 
-structured report
+providing below options for saving json/csv (text) to dicom:
+
+ + (preferred?) create a structured report, see json2dicom.py
+
+ + save as text or binary to private tag, see https://grok.com/share/bGVnYWN5_3247a87d-5aae-4e44-8bc8-5cf544f9b16c
+
+
+```
 
 https://highdicom.readthedocs.io/en/latest/quickstart.html#creating-structured-report-sr-documents
 
