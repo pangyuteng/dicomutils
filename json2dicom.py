@@ -34,6 +34,8 @@ def generate_dicom_from_json(input_json, series_number, ref_dcm_obj=None, series
     ds.Modality = 'SR'
     ds.SpecificCharacterSet = 'ISO_IR 100' 
     
+    # NOTE: going against dicom sr standards, just dumping json to text.
+
     input_json_str = json.dumps(input_json)
 
     sub_item = Dataset()
