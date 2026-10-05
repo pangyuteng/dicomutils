@@ -1,4 +1,5 @@
 # copied from https://github.com/rohithkumar31/pdf2dicom/blob/master/pdf2dicom.py
+# https://github.com/pydicom/pydicom/issues/1511
 
 import pydicom
 import tempfile
