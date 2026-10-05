@@ -5,23 +5,21 @@ import json
 from pydicom.sequence import Sequence
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.uid import generate_uid
+from pydicom.uid import ExplicitVRLittleEndian, BasicTextSRStorage, PYDICOM_IMPLEMENTATION_UID
 
-def generate_dicom_from_json(input_json):
+def generate_dicom_from_json(input_json, series_number, ref_dcm_obj=None, series_description="JSON"):
 
-    input_json_str = json.dumps(input_json)
+    sop_instance_uid = generate_uid()
+    series_instance_uid = generate_uid()
 
     suffix = '.dcm'
     filename = tempfile.NamedTemporaryFile(suffix=suffix).name
 
-    BasicTextSRIOD = '1.2.840.10008.5.1.4.1.1.88.11'
-
     file_meta = Dataset()
-    file_meta.MediaStorageSOPClassUID = BasicTextSRIOD
-    file_meta.MediaStorageSOPInstanceUID = generate_uid()
-    file_meta.ImplementationClassUID = '1.3.46.670589.50.1.8.0'
-    file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
-
-    pydicom.dataset.validate_file_meta(file_meta,enforce_standard=False)
+    file_meta.MediaStorageSOPClassUID = BasicTextSRStorage
+    file_meta.MediaStorageSOPInstanceUID = sop_instance_uid
+    file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
+    file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
     ds = FileDataset(filename, {}, file_meta=file_meta, preamble=b"\0" * 128)
 
@@ -33,33 +31,35 @@ def generate_dicom_from_json(input_json):
     ds.ContentTime = dt.strftime('%H%M%S.%f')
 
     ds.SOPClassUID = BasicTextSRIOD
-
     ds.Modality = 'SR'
     ds.SpecificCharacterSet = 'ISO_IR 100' 
     
-    sub_block = Dataset()
-    sub_block.CodeValue = 'CODE_01'
-    sub_block.CodingSchemeDesignator = 'NA'
-    sub_block.CodeMeaning = 'CAD Summary'
+    input_json_str = json.dumps(input_json)
 
-    block = Dataset()
-    block.RelationshipType = "CONTAINS"
-    block.ValueType = "TEXT"
-    block.ConceptNameCodeSequence = Sequence([sub_block])
-    block.TextValue = input_json_str
+    sub_item = Dataset()
+    sub_item.CodeValue = 'CODE_01'
+    sub_item.CodingSchemeDesignator = 'NA'
+    sub_item.CodeMeaning = 'CAD Summary'
 
-    ds.ContentSequence = Sequence([block])
+    item = Dataset()
+    item.RelationshipType = "CONTAINS"
+    item.ValueType = "TEXT"
+    item.ConceptNameCodeSequence = Sequence([sub_item])
+    item.TextValue = input_json_str
 
-    # # TODO:
-    # ds.SeriesNumber = series_number
-    # ds.SOPInstanceUID = generate_uid()
-    # ds.SeriesInstanceUID = generate_uid()
-    # ds.SeriesDescription = series_description
-    # ds.PatientID = ref_dcm_obj.PatientID
-    # ds.PatientName = ref_dcm_obj.PatientName
-    # ds.StudyDate = ref_dcm_obj.StudyDate
-    # ds.StudyInstanceUID = ref_dcm_obj.StudyInstanceUID
-    # ds.ReferencedSeriesSequence = [ref_dcm_obj]
+    ds.ContentSequence = Sequence([item])
+
+    ds.SeriesNumber = series_number
+    ds.SOPInstanceUID = sop_instance_uid
+    ds.SeriesInstanceUID = series_instance_uid
+    ds.SeriesDescription = series_description
+
+    if ref_dcm_obj is not None:
+      ds.PatientID = ref_dcm_obj.PatientID
+      ds.PatientName = ref_dcm_obj.PatientName
+      ds.StudyDate = ref_dcm_obj.StudyDate
+      ds.StudyInstanceUID = ref_dcm_obj.StudyInstanceUID
+      ds.ReferencedSeriesSequence = [ref_dcm_obj]
 
     return ds
 
