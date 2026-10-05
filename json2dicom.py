@@ -7,10 +7,16 @@ from pydicom.dataset import Dataset, FileDataset
 from pydicom.uid import generate_uid
 from pydicom.uid import ExplicitVRLittleEndian, BasicTextSRStorage, PYDICOM_IMPLEMENTATION_UID
 
-def generate_dicom_from_json(input_json, series_number, ref_dcm_obj=None, series_description="JSON"):
+def generate_dicom_from_json(input_json, series_number, 
+    sop_instance_uid = None, series_instance_uid = None,
+    ref_dcm_obj = None, series_description = "JSON",
+    is_validate_file_meta = True):
 
-    sop_instance_uid = generate_uid()
-    series_instance_uid = generate_uid()
+    if sop_instance_uid is None:
+        sop_instance_uid = generate_uid()
+
+    if series_instance_uid is None:
+        series_instance_uid = generate_uid()
 
     suffix = '.dcm'
     filename = tempfile.NamedTemporaryFile(suffix=suffix).name
